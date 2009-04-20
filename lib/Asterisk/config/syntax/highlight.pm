@@ -2,7 +2,7 @@ package Asterisk::config::syntax::highlight;
 use strict "vars";
 use Syntax::Highlight::Engine::Simple;
 our $strict;
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use Class::Std::Utils;
 {
@@ -66,16 +66,30 @@ use Class::Std::Utils;
 
     }
 
-    #return array ref
-    sub return {
-        my ($self) = @_;
-        return $global{ ident $self}{datas};
-    }
-
     #only return array references now
     sub return_html_array_ref {
         my ( $self, %options ) = @_;
         return $global{ ident $self}{datas};
+    }
+
+    sub return_ubb_array_ref {
+        my ( $self, %options ) = @_;
+        my @data =
+          map { html2ubb($_); } @{ $global{ ident $self}{datas} };
+        return \@data;
+
+    }
+
+    sub html2ubb {
+        my $text = shift;
+        $text =~ s/<span(\s)class='keyword'>/[color=blue]/ig;
+        $text =~ s/<span(\s)class='function'>/[color=olive]/ig;
+        $text =~ s/<span(\s)class='comment'>/[color=seagreen]/ig;
+        $text =~ s/<span(\s)class='value'>/[color=purple]/ig;
+        $text =~ s/<span(\s)class='identifier'>/[color=magenta]/ig;
+        $text =~ s/<span(\s)class='exten'>/[color=red]/ig;
+        $text =~ s/<\/span>/[\/color]/ig;
+        return $text;
     }
 
     sub DESTROY {
@@ -418,6 +432,8 @@ Asterisk::config::syntax::highlight - highlight Asterisk config syntax
     my $config = Asterisk::config::syntax::highlight->new();
        $config->load_file(file=>file name);
     print @{$config->return_html_array_ref()};
+    print @{$config->return_ubb_array_ref()};
+    exit;
 
 =head1 DESCRIPTION
 
@@ -449,6 +465,12 @@ Takes one mandatory argument which is a asterisk config file that you want to hi
     return_html_array_ref;
 
 Returns the highlighted code as HTML by array references.
+
+=head2 C<return_ubb_array_ref>
+
+    return_ubb_array_ref;
+
+Returns the highlighted code as UBB by array references.
 
 =head1 COLORING YOUR HIGHLIGHTED CSS
 

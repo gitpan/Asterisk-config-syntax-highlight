@@ -1,5 +1,7 @@
-Build.PL
-lib/Asterisk/config/syntax/highlight.pm
-MANIFEST			This list of files
+Changes
 Makefile.PL
-META.yml
+MANIFEST
+README
+t/Asterisk-config-syntax-highlight.t
+lib/Asterisk/config/syntax/highlight.pm
+META.yml                                 Module meta-data (added by MakeMaker)
