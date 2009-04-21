@@ -2,7 +2,7 @@ package Asterisk::config::syntax::highlight;
 use strict "vars";
 use Syntax::Highlight::Engine::Simple;
 our $strict;
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use Class::Std::Utils;
 {
@@ -35,7 +35,11 @@ use Class::Std::Utils;
                 },
                 {
                     class  => 'exten',
-                    regexp => '[\[\]]',
+                    regexp => q!(\s*)\[(.*)\]!,
+                },
+                {
+                    class  => 'exten',
+                    regexp => q!include(\s*)(=|=>)(.*)!,
                 },
                 {
                     class  => 'exten',
@@ -60,7 +64,7 @@ use Class::Std::Utils;
         $/ = "\n";
 
         my @data =
-          map { $highlight->doStr( str => $_ ) . "<br />\n"; }
+          map { $highlight->doStr( str => $_ ) }
           split( /\n/, $datas );
         $global{ ident $self}{datas} = \@data;
 
@@ -92,6 +96,10 @@ use Class::Std::Utils;
         return $text;
     }
 
+sub html2wiki
+	{
+#~~red:text~~
+}
     sub DESTROY {
         my ($self) = @_;
         delete $global{ ident $self};
@@ -357,10 +365,6 @@ use Class::Std::Utils;
 
     sub exten {
         return qw/
-          general
-          globals
-          default
-          include
           exten
           /;
     }
