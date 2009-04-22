@@ -4,6 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Asterisk::config::syntax::highlight',
     VERSION_FROM      => 'lib/Asterisk/config/syntax/highlight.pm', # finds $VERSION
+    LICENSE           => 'perl',
     PREREQ_PM         => {Class::Std::Utils=>0,
                           Syntax::Highlight::Engine::Simple=>0
                          }, # e.g., Module::Name => 1.1

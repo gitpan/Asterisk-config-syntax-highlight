@@ -2,7 +2,7 @@ package Asterisk::config::syntax::highlight;
 use strict "vars";
 use Syntax::Highlight::Engine::Simple;
 our $strict;
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use Class::Std::Utils;
 {
@@ -79,13 +79,20 @@ use Class::Std::Utils;
     sub return_ubb_array_ref {
         my ( $self, %options ) = @_;
         my @data =
-          map { html2ubb($_); } @{ $global{ ident $self}{datas} };
+          map { $self->html2ubb($_); } @{ $global{ ident $self}{datas} };
         return \@data;
 
     }
 
+    sub return_wiki_array_ref {
+        my ( $self, %options ) = @_;
+        my @data =
+          map { $self->html2wiki($_); } @{ $global{ ident $self}{datas} };
+        return \@data;
+    }
+
     sub html2ubb {
-        my $text = shift;
+        my ( $self, $text ) = @_;
         $text =~ s/<span(\s)class='keyword'>/[color=blue]/ig;
         $text =~ s/<span(\s)class='function'>/[color=olive]/ig;
         $text =~ s/<span(\s)class='comment'>/[color=seagreen]/ig;
@@ -96,10 +103,19 @@ use Class::Std::Utils;
         return $text;
     }
 
-sub html2wiki
-	{
-#~~red:text~~
-}
+    sub html2wiki {
+        my ( $self, $text ) = @_;
+        $text =~ s/<span(\s)class='keyword'>/~~blue:/ig;
+        $text =~ s/<span(\s)class='function'>/~~olive:/ig;
+        $text =~ s/<span(\s)class='comment'>/~~seagreen:/ig;
+        $text =~ s/<span(\s)class='value'>/~~purple:/ig;
+        $text =~ s/<span(\s)class='identifier'>/~~magenta:/ig;
+        $text =~ s/<span(\s)class='exten'>/~~red:/ig;
+        $text =~ s/<\/span>/~~/ig;
+        $text =~ s/\[/\[\[/ig;
+        return $text;
+    }
+
     sub DESTROY {
         my ($self) = @_;
         delete $global{ ident $self};
@@ -435,8 +451,9 @@ Asterisk::config::syntax::highlight - highlight Asterisk config syntax
 
     my $config = Asterisk::config::syntax::highlight->new();
        $config->load_file(file=>file name);
-    print @{$config->return_html_array_ref()};
-    print @{$config->return_ubb_array_ref()};
+    print join '<br />', @{$config->return_html_array_ref()};
+    print join "\n", @{$config->return_ubb_array_ref()};
+    print join "\n", @{$config->return_wiki_array_ref()};
     exit;
 
 =head1 DESCRIPTION
@@ -476,10 +493,16 @@ Returns the highlighted code as HTML by array references.
 
 Returns the highlighted code as UBB by array references.
 
+=head2 C<return_wiki_array_ref>
+
+    return_wiki_array_ref;
+
+Returns the highlighted code as WIKITEXT by array references.
+
 =head1 COLORING YOUR HIGHLIGHTED CSS
 
 To actually set any colors on your "highlighted" CSS code returned
-from the C<dump2html()> method you need to style all the generated C<< <spans>
+from the C<return_html_array_ref()> method you need to style all the generated C<< <spans>
 >> with CSS; a sample CSS code to do that is shown in the section below.
 Each C<< <span> >> will have the following class names/meanings:
 
@@ -517,7 +540,7 @@ C<exten> -  like  keyword
 =back
 
 
-=head1 SAMPLE STYLE SHEET FOR COLORING HIGHLIGHTED CODE
+=head2 SAMPLE STYLE SHEET FOR COLORING HIGHLIGHTED CODE
 
  span.keyword  {color: #00f}
 
