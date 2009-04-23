@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Asterisk-config-syntax-highlight
-version:             0.4
+version:             0.5
 abstract:            highlight Asterisk config syntax
 license:             perl
 author:              

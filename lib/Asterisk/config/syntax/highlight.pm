@@ -2,7 +2,7 @@ package Asterisk::config::syntax::highlight;
 use strict "vars";
 use Syntax::Highlight::Engine::Simple;
 our $strict;
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 use Class::Std::Utils;
 {
@@ -24,6 +24,10 @@ use Class::Std::Utils;
                 {
                     class  => 'identifier',
                     regexp => "\[(.*)\]",
+                },
+				{
+                    class  => 'exten',
+                    regexp => qr!\\;!,
                 },
                 {
                     class  => 'value',
@@ -79,7 +83,7 @@ use Class::Std::Utils;
     sub return_ubb_array_ref {
         my ( $self, %options ) = @_;
         my @data =
-          map { $self->html2ubb($_); } @{ $global{ ident $self}{datas} };
+          map { $self->_html2ubb($_); } @{ $global{ ident $self}{datas} };
         return \@data;
 
     }
@@ -87,11 +91,11 @@ use Class::Std::Utils;
     sub return_wiki_array_ref {
         my ( $self, %options ) = @_;
         my @data =
-          map { $self->html2wiki($_); } @{ $global{ ident $self}{datas} };
+          map { $self->_html2wiki($_); } @{ $global{ ident $self}{datas} };
         return \@data;
     }
 
-    sub html2ubb {
+    sub _html2ubb {
         my ( $self, $text ) = @_;
         $text =~ s/<span(\s)class='keyword'>/[color=blue]/ig;
         $text =~ s/<span(\s)class='function'>/[color=olive]/ig;
@@ -103,7 +107,7 @@ use Class::Std::Utils;
         return $text;
     }
 
-    sub html2wiki {
+    sub _html2wiki {
         my ( $self, $text ) = @_;
         $text =~ s/<span(\s)class='keyword'>/~~blue:/ig;
         $text =~ s/<span(\s)class='function'>/~~olive:/ig;
